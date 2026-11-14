@@ -1,531 +1,750 @@
-﻿<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0d0d0f">
-  <title>DROP — временная загрузка файлов</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#06111d">
+  <title>RP-морозовы — REGION RP</title>
 
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --bg: #06111d;
+      --panel: rgba(12, 30, 46, .88);
+      --blue: #42ccff;
+      --ice: #b5efff;
+      --white: #edfaff;
+      --muted: #a1bacb;
+      --line: rgba(100, 211, 255, .2);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--white);
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(27, 145, 195, .2), transparent 55%),
+        linear-gradient(145deg, #071522, #030811 75%);
+      font-family: "Segoe UI", Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    #sky {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    .ice-glow {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 8% 85%, rgba(29,156,220,.13), transparent 36%),
+        radial-gradient(ellipse at 93% 25%, rgba(74,208,255,.1), transparent 33%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+
+    .container {
+      width: min(1120px, calc(100% - 36px));
+      margin: 0 auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(4, 13, 23, .78);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+    }
+
+    nav {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      color: var(--ice);
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-shadow: 0 0 18px rgba(57, 201, 255, .48);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+
+    .nav-links a:hover { color: white; }
+
+    .discord-link, .apply-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid rgba(108, 221, 255, .48);
+      border-radius: 12px;
+      color: #03111a;
+      font-weight: 800;
+      background: linear-gradient(135deg, #b5efff, #42ccff);
+      box-shadow: 0 0 22px rgba(57, 201, 255, .17);
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s, filter .2s;
+    }
+
+    .discord-link { padding: 11px 16px; }
+
+    .discord-link:hover, .apply-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(57, 201, 255, .38);
+      filter: brightness(1.08);
+    }
+
+    .hero {
+      min-height: 550px;
+      display: grid;
+      place-items: center;
+      padding: 80px 0;
+      text-align: center;
+    }
+
+    .hero-content { animation: rise .8s ease both; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ice);
+      background: rgba(23, 67, 91, .3);
+      font-size: .85rem;
+      letter-spacing: .06em;
+    }
+
+    h1 {
+      margin: 22px 0 12px;
+      color: #eafaff;
+      font-size: clamp(3.2rem, 10vw, 7rem);
+      line-height: .95;
+      letter-spacing: -.065em;
+      text-shadow: 0 0 22px rgba(57, 201, 255, .35),
+                   0 0 65px rgba(57, 201, 255, .16);
+    }
+
+    .hero p {
+      max-width: 650px;
+      margin: 18px auto 28px;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-actions .discord-link { padding: 14px 20px; }
+
+    .outline-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 13px 20px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--ice);
+      background: rgba(8, 22, 34, .65);
+      transition: .2s;
+    }
+
+    .outline-link:hover {
+      border-color: var(--blue);
+      background: rgba(30, 100, 130, .25);
+    }
+
+    .section { padding: 45px 0 70px; }
+
+    .section-heading {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .section-heading h2 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 3.15rem);
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .rank-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 15px;
+    }
+
+    .rank-card {
+      position: relative;
+      min-height: 220px;
+      padding: 20px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(17, 42, 61, .88), rgba(7, 19, 31, .86));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      animation: rise .6s both;
+      transition: transform .25s, border-color .25s, box-shadow .25s;
+    }
+
+    .rank-card::before {
+      content: "";
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      right: -48px;
+      top: -55px;
+      border-radius: 50%;
+      background: rgba(57, 201, 255, .15);
+      filter: blur(30px);
+    }
+
+    .rank-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(83, 214, 255, .65);
+      box-shadow: 0 16px 38px rgba(0,0,0,.25), 0 0 25px rgba(57,201,255,.1);
+    }
+
+    .rank-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .rank-number {
+      color: var(--blue);
+      font-size: .75rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .rank-icon {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(141, 229, 255, .38);
+      border-radius: 15px;
+      color: #d7f8ff;
+      background: linear-gradient(145deg, rgba(70, 190, 232, .24), rgba(13, 42, 62, .7));
+      box-shadow: 0 0 20px rgba(57, 201, 255, .14),
+                  inset 0 1px 0 rgba(255,255,255,.12);
+      font-size: 1.45rem;
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    .rank-card h3 {
+      position: relative;
+      margin: 14px 0 18px;
+      font-size: 1.35rem;
+    }
+
+    .apply-btn {
+      position: relative;
+      width: 100%;
+      padding: 12px 14px;
+      font-size: .92rem;
+    }
+
+    .info-panel {
+      padding: clamp(22px, 5vw, 38px);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--panel);
+      box-shadow: 0 18px 60px rgba(0,0,0,.18);
+    }
+
+    .steps {
+      display: grid;
+      gap: 13px;
+      padding: 0;
+      margin: 23px 0 0;
+      list-style: none;
+      counter-reset: step;
+    }
+
+    .steps li {
+      counter-increment: step;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 15px;
+      border: 1px solid rgba(100,211,255,.1);
+      border-radius: 13px;
+      color: #c6dce8;
+      background: rgba(67, 142, 177, .08);
+      line-height: 1.55;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      flex: 0 0 29px;
+      height: 29px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      color: #06131e;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--ice), var(--blue));
+    }
+
+    .rules {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .rules summary {
+      padding: 9px 0;
+      color: var(--ice);
+      font-weight: 800;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .rules summary::-webkit-details-marker { display: none; }
+    .rules summary::after { content: "+"; float: right; font-size: 1.3rem; }
+    .rules[open] summary::after { content: "−"; }
+
+    .rules ol {
+      padding-left: 24px;
+      color: #c6dce8;
+      line-height: 1.9;
+    }
+
+    footer {
+      padding: 28px 0 40px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      text-align: center;
+    }
+
+    footer strong { color: var(--ice); }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(1, 6, 12, .8);
+      backdrop-filter: blur(9px);
+    }
+
+    .modal.open {
+      display: flex;
+      animation: fade .2s ease;
+    }
+
+    .modal-box {
+      position: relative;
+      width: min(600px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      padding: 28px;
+      border: 1px solid rgba(100, 211, 255, .36);
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(57,201,255,.12), transparent 38%),
+        linear-gradient(145deg, #10283a, #07131f);
+      box-shadow: 0 0 60px rgba(20, 157, 210, .2);
+      animation: pop .25s ease;
+    }
+
+    .modal-title-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-right: 32px;
+    }
+
+    .modal-rank-icon {
+      flex: 0 0 52px;
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(141, 229, 255, .42);
+      border-radius: 16px;
+      color: var(--ice);
+      background: rgba(57,201,255,.12);
+      font-size: 1.65rem;
+      box-shadow: 0 0 24px rgba(57,201,255,.15);
+    }
+
+    .modal-box h2 { margin: 0; font-size: 1.65rem; }
+    .modal-box > p { color: var(--muted); line-height: 1.6; }
+    .selected-rank { color: var(--ice) !important; font-weight: 800; }
+
+    .close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      border: 0;
+      color: var(--muted);
+      background: none;
+      font-size: 1.9rem;
+      cursor: pointer;
+    }
+
+    .application-label {
+      margin: 22px 0 10px;
+      color: var(--ice);
+      font-size: .85rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .application-box {
+      padding: 18px;
+      border: 1px solid rgba(100,211,255,.2);
+      border-radius: 15px;
+      background: rgba(3, 12, 20, .55);
+      color: #d8edf6;
+      line-height: 1.75;
+    }
+
+    .application-box p { margin: 0 0 12px; }
+    .application-box ol { margin: 0; padding-left: 23px; }
+    .application-box li { padding-left: 4px; margin: 7px 0; }
+
+    .modal-rules {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(57, 201, 255, .07);
+      color: #cbe2ec;
+      line-height: 1.7;
+    }
+
+    .modal-rules strong { color: var(--ice); }
+
+    .modal .discord-link {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px;
+    }
+
+    .hint {
+      margin: 12px 0 0 !important;
+      text-align: center;
+      font-size: .85rem;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pop {
+      from { opacity: 0; transform: scale(.96) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes fade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes shimmer {
+      0%, 100% { transform: translateY(0); box-shadow: 0 0 15px rgba(57,201,255,.12); }
+      50% { transform: translateY(-3px); box-shadow: 0 0 25px rgba(57,201,255,.28); }
+    }
+
+    @media (max-width: 850px) {
+      .rank-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      nav { min-height: 64px; }
+      .nav-links { gap: 12px; }
+      .nav-links a:not(.discord-link) { display: none; }
+      .rank-grid { grid-template-columns: repeat(2, 1fr); gap: 11px; }
+      .rank-card { min-height: 198px; padding: 15px; }
+      .rank-card h3 { font-size: 1.2rem; }
+      .hero { min-height: 500px; }
+      .modal-box { padding: 23px 18px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
-  <main class="app">
-    <header class="topbar">
-      <div class="logo" aria-hidden="true">D</div>
-      <div>
-        <div class="brand">DROP</div>
-        <div class="brand-caption">Временная передача файлов</div>
-      </div>
-    </header>
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <div class="ice-glow"></div>
 
-    <section class="heading">
-      <h1>Файлы. Просто.</h1>
-      <p>
-        Перетащите файлы в область загрузки. До 15 ГБ на один файл
-        и до 45 ГБ общего объёма.
-      </p>
+  <header>
+    <nav class="container">
+      <a class="brand" href="#">❄ RP-МОРОЗОВЫ</a>
+      <div class="nav-links">
+        <a href="#ranks">Ранги</a>
+        <a href="#rules">Правила</a>
+        <a class="discord-link" href="https://discord.gg/ZNpMtGvt54" target="_blank" rel="noopener noreferrer">
+          ↗ Discord
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero container">
+      <div class="hero-content">
+        <span class="eyebrow">❄ Семья находится на REGION RP</span>
+        <h1>RP-морозовы</h1>
+        <p>
+          Холодный стиль, крепкая команда и путь к своему рангу.
+          Выбери ранг, прочитай инструкцию и отправь заявку в Discord.
+        </p>
+        <div class="hero-actions">
+          <a class="discord-link" href="https://discord.gg/ZNpMtGvt54" target="_blank" rel="noopener noreferrer">
+            Вступить в Discord ↗
+          </a>
+          <a class="outline-link" href="#ranks">Выбрать ранг ↓</a>
+        </div>
+      </div>
     </section>
 
-    <section class="card">
-      <div class="drop-zone" id="dropZone">
-        <div>
-          <div class="drop-icon" aria-hidden="true">↑</div>
-          <p class="drop-title">Перетащите файлы сюда</p>
-          <p class="drop-hint">Поддерживаются любые типы файлов</p>
-          <label class="browse-button" for="fileInput">Или выберите файлы</label>
-        </div>
+    <section class="section container" id="ranks">
+      <div class="section-heading">
+        <h2>❄ Ранги семьи ❄</h2>
+        <p>Выбери ранг и нажми кнопку, чтобы открыть инструкцию подачи заявки.</p>
       </div>
-
-      <input id="fileInput" type="file" multiple>
-
-      <section class="storage-card" aria-label="Использование хранилища">
-        <div class="storage-top">
-          <div class="storage-title">Общее занятое место</div>
-          <div class="storage-numbers">
-            <strong id="usedText">0 Б</strong> / 45 ГБ
-          </div>
-        </div>
-        <div class="bar" aria-label="Занятое место">
-          <div class="bar-fill" id="storageFill"></div>
-        </div>
-        <div class="storage-details">
-          <span id="remainingText">Осталось 45 ГБ</span>
-          <span>Лимит одного файла — 15 ГБ</span>
-        </div>
-      </section>
-
-      <section class="file-section">
-        <div class="section-title">
-          <h2>Файлы к загрузке</h2>
-          <span class="file-count" id="fileCount">0 файлов</span>
-        </div>
-
-        <div class="file-list" id="fileList"></div>
-
-        <div class="actions">
-          <div class="pending-size">
-            В выбранных файлах: <strong id="pendingSize">0 Б</strong>
-          </div>
-          <button class="upload-button" id="uploadButton" type="button" disabled>
-            Продолжить загрузку
-          </button>
-        </div>
-
-        <div class="progress-wrap" id="progressWrap">
-          <div class="progress-info">
-            <span id="progressText">Загрузка…</span>
-            <span id="progressPercent">0%</span>
-          </div>
-          <progress id="progressBar" max="100" value="0"></progress>
-        </div>
-
-        <p class="status" id="status" role="status" aria-live="polite"></p>
-      </section>
-
-      <!-- БЛОК: Список файлов на сервере -->
-      <section class="file-section" style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
-        <div class="section-title">
-          <h2>Загруженные файлы на сервере</h2>
-          <span class="file-count" id="serverFileCount">0 файлов</span>
-        </div>
-        <div class="file-list" id="serverFileList" style="max-height: 300px; overflow-y: auto;">
-          <!-- Сюда будут подгружаться файлы с сервера -->
-        </div>
-      </section>
+      <div class="rank-grid" id="rankGrid"></div>
     </section>
 
-    <footer>
-      Показатель занятого места приходит с сервера. Лимиты и срок хранения
-      необходимо проверять на сервере — не только в браузере.
-    </footer>
+    <section class="section container" id="rules">
+      <div class="info-panel">
+        <div class="section-heading" style="text-align:left;margin-bottom:0">
+          <h2>Как подать заявку</h2>
+          <p>Выполни шаги ниже, чтобы отправить заявку на выбранный ранг.</p>
+        </div>
+
+        <ol class="steps">
+          <li>Зайди на Discord-сервер семьи по ссылке на сайте или по кнопке ниже.</li>
+          <li>Напиши в чате <b>«заявки на ранг»</b>.</li>
+          <li>Укажи выбранный ранг и заполни все пункты заявки.</li>
+          <li>Прикрепи видео со стрельбой — на нём должен быть виден статик.</li>
+          <li>Подтверди, что ознакомился с правилами семьи.</li>
+        </ol>
+
+        <details class="rules">
+          <summary>Правила семьи — нажми, чтобы открыть</summary>
+          <ol>
+            <li>Скам — ЧС.</li>
+            <li>Спам — выговор 1.</li>
+            <li>Одежда не в цвет семьи — выговор 1.</li>
+          </ol>
+        </details>
+
+        <a class="discord-link" style="margin-top:22px"
+           href="https://discord.gg/ZNpMtGvt54" target="_blank" rel="noopener noreferrer">
+          Перейти на Discord-сервер ↗
+        </a>
+      </div>
+    </section>
   </main>
 
-  <!-- Модальное окно выбора срока -->
-  <div class="modal-backdrop" id="modalBackdrop" role="presentation">
-    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <div class="modal-mark" aria-hidden="true">◷</div>
-      <h2 id="modalTitle">Когда удалить файлы?</h2>
-      <p class="modal-description">
-        Выберите срок хранения. По его окончании сервер автоматически удалит загруженные файлы.
-      </p>
+  <footer>
+    <div class="container"><strong>RP-морозовы</strong> · Семья на REGION RP</div>
+  </footer>
 
-      <label class="expiry-label" for="expirySelect">Срок хранения</label>
-      <select class="expiry-select" id="expirySelect">
-        <option value="60">1 минута</option>
-        <option value="300">5 минут</option>
-        <option value="900">15 минут</option>
-        <option value="1800">30 минут</option>
-        <option value="3600">1 час</option>
-        <option value="21600">6 часов</option>
-        <option value="43200">12 часов</option>
-        <option value="86400" selected>1 день</option>
-        <option value="259200">3 дня</option>
-        <option value="604800">7 дней</option>
-      </select>
+  <div class="modal" id="rankModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-box">
+      <button class="close" id="closeModal" aria-label="Закрыть">&times;</button>
 
-      <p class="expiry-note" id="expiryNote">
-        Файлы будут доступны до истечения выбранного срока.
-      </p>
-
-      <div class="modal-actions">
-        <button class="modal-button" id="cancelUpload" type="button">Отмена</button>
-        <button class="modal-button primary" id="confirmUpload" type="button">Загрузить</button>
+      <div class="modal-title-row">
+        <div class="modal-rank-icon" id="modalRankIcon">❄</div>
+        <div>
+          <h2 id="modalTitle">Инструкция</h2>
+          <p class="selected-rank" id="selectedRank"></p>
+        </div>
       </div>
-    </section>
+
+      <p>
+        Чтобы получить выбранный ранг, зайди на Discord-сервер и отправь заявку
+        в чате <b>«заявки на ранг»</b>.
+      </p>
+
+      <div class="application-label">Образец заявки</div>
+      <div class="application-box">
+        <p><b>Заявка на семейный ранг</b></p>
+        <ol>
+          <li>Сколько вы играете в день? Например: 1 минута / 24 часа.</li>
+          <li>Прикрепите видео со своей стрельбой. Важно, чтобы на видео был виден статик.</li>
+          <li>Какое у вас имя и фамилия в игре?</li>
+          <li>Вы ознакомились с правилами семьи?</li>
+        </ol>
+      </div>
+
+      <div class="modal-rules">
+        <strong>Правила семьи:</strong><br>
+        1.1 Скам — ЧС.<br>
+        1.2 Спам — выговор 1.<br>
+        1.3 Одежда не в цвет семьи — выговор 1.
+      </div>
+
+      <a class="discord-link" href="https://discord.gg/ZNpMtGvt54" target="_blank" rel="noopener noreferrer">
+        Открыть Discord и подать заявку ↗
+      </a>
+      <p class="hint">Ссылка ведёт на сервер RP-морозовых.</p>
+    </div>
   </div>
 
-  <!-- Модальное окно с ссылками для шаринга -->
-  <div class="modal-backdrop" id="shareModalBackdrop" role="presentation">
-    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
-      <div class="modal-mark" aria-hidden="true" style="color: #9fe0b5; border-color: #9fe0b5; background: #9fe0b51a;">✓</div>
-      <h2 id="shareModalTitle">Успешно загружено!</h2>
-      <p class="modal-description">
-        Скопируйте ссылки, чтобы поделиться файлами.
-      </p>
+  <script>
+    const rankGrid = document.getElementById("rankGrid");
+    const modal = document.getElementById("rankModal");
+    const selectedRank = document.getElementById("selectedRank");
+    const modalRankIcon = document.getElementById("modalRankIcon");
 
-      <div id="shareLinksList" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px;">
-        <!-- Сюда будут вставляться ссылки -->
-      </div>
+    const rankIcons = ["❄", "✦", "◇", "⚔", "♢", "❖", "🛡", "⚜", "♛", "👑"];
 
-      <div class="modal-actions">
-        <button class="modal-button primary" id="closeShareModal" type="button">Готово</button>
-      </div>
-    </section>
-  </div>
-
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-    const supabaseUrl = 'https://yfeqfmbxiaszpyugvouq.supabase.co';
-    const supabaseKey = 'sb_publishable_2n7iNNQ6sphuiUlUk8YZDg__J41n-vJ'; 
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    const TOTAL_LIMIT = 45 * 1024 ** 3;
-    const FILE_LIMIT = 15 * 1024 ** 3;
-
-    // DOM Элементы
-    const fileInput = document.getElementById("fileInput");
-    const dropZone = document.getElementById("dropZone");
-    const fileList = document.getElementById("fileList");
-    const fileCount = document.getElementById("fileCount");
-    const pendingSize = document.getElementById("pendingSize");
-    const usedText = document.getElementById("usedText");
-    const remainingText = document.getElementById("remainingText");
-    const storageFill = document.getElementById("storageFill");
-    const uploadButton = document.getElementById("uploadButton");
-    const statusElement = document.getElementById("status");
-    
-    const modalBackdrop = document.getElementById("modalBackdrop");
-    const expirySelect = document.getElementById("expirySelect");
-    const expiryNote = document.getElementById("expiryNote");
-    const confirmUpload = document.getElementById("confirmUpload");
-    const cancelUpload = document.getElementById("cancelUpload");
-    
-    const shareModalBackdrop = document.getElementById("shareModalBackdrop");
-    const shareLinksList = document.getElementById("shareLinksList");
-    const closeShareModal = document.getElementById("closeShareModal");
-
-    const progressWrap = document.getElementById("progressWrap");
-    const progressBar = document.getElementById("progressBar");
-    const progressText = document.getElementById("progressText");
-    const progressPercent = document.getElementById("progressPercent");
-
-    const serverFileList = document.getElementById("serverFileList");
-    const serverFileCount = document.getElementById("serverFileCount");
-
-    // Переменные состояния
-    let files = [];
-    let usedBytes = 0;
-    let isUploading = false;
-
-    // Вспомогательные функции
-    function formatSize(bytes) {
-      if (bytes <= 0) return "0 Б";
-      const units = ["Б", "КБ", "МБ", "ГБ", "ТБ"];
-      const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
-      const value = bytes / (1024 ** index);
-      return `${value.toLocaleString("ru-RU", { maximumFractionDigits: index === 0 ? 0 : 2 })} ${units[index]}`;
+    for (let i = 1; i <= 10; i++) {
+      const icon = rankIcons[i - 1];
+      const card = document.createElement("article");
+      card.className = "rank-card";
+      card.style.animationDelay = `${i * 55}ms`;
+      card.innerHTML = `
+        <div class="rank-top">
+          <span class="rank-number">Семейный ранг · ${String(i).padStart(2, "0")}</span>
+          <span class="rank-icon" aria-hidden="true">${icon}</span>
+        </div>
+        <h3>Ранг ${i}</h3>
+        <button class="apply-btn" type="button" data-rank="${i}" data-icon="${icon}">
+          ✧ Подать заявку
+        </button>
+      `;
+      rankGrid.appendChild(card);
     }
 
-    function pluralFiles(amount) {
-      const mod10 = amount % 10;
-      const mod100 = amount % 100;
-      if (mod10 === 1 && mod100 !== 11) return `${amount} файл`;
-      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${amount} файла`;
-      return `${amount} файлов`;
+    rankGrid.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-rank]");
+      if (!button) return;
+
+      selectedRank.textContent = `Вы выбрали: Ранг ${button.dataset.rank}`;
+      modalRankIcon.textContent = button.dataset.icon;
+      modal.classList.add("open");
+      document.body.style.overflow = "hidden";
+    });
+
+    function closeModal() {
+      modal.classList.remove("open");
+      document.body.style.overflow = "";
     }
 
-    function escapeHtml(value) {
-      return String(value).replace(/[&<>"']/g, char => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-      })[char]);
+    document.getElementById("closeModal").addEventListener("click", closeModal);
+
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) closeModal();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeModal();
+    });
+
+    // Движущиеся снежинки и звёзды на фоне.
+    const canvas = document.getElementById("sky");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    let width = 0;
+    let height = 0;
+
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const count = Math.min(130, Math.floor(width * height / 8500));
+      particles = Array.from({ length: count }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 1.8 + .4,
+        speed: Math.random() * .4 + .1,
+        drift: (Math.random() - .5) * .25,
+        phase: Math.random() * Math.PI * 2,
+        sparkle: Math.random() > .78
+      }));
     }
 
-    function selectedBytes() {
-      return files.reduce((sum, file) => sum + file.size, 0);
-    }
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+      const time = Date.now() * .001;
 
-    function updateStorageDisplay() {
-      const safeUsed = Math.max(0, Math.min(usedBytes, TOTAL_LIMIT));
-      const left = Math.max(0, TOTAL_LIMIT - safeUsed);
-      const percent = Math.min(100, (safeUsed / TOTAL_LIMIT) * 100);
-      usedText.textContent = formatSize(usedBytes);
-      remainingText.textContent = `Осталось ${formatSize(left)}`;
-      storageFill.style.width = `${percent}%`;
-    }
+      for (const particle of particles) {
+        particle.y -= particle.speed;
+        particle.x += particle.drift + Math.sin(time + particle.phase) * .12;
 
-    // Загрузка списка файлов с сервера
-    async function loadServerFiles() {
-      try {
-        const { data, error } = await supabase.storage.from('DROP').list('', { limit: 1000 });
-        if (error) throw error;
-
-        serverFileList.innerHTML = "";
-        let total = 0;
-        let count = 0;
-
-        data.forEach(file => {
-          if (file.name.startsWith('.')) return;
-          count++;
-          const size = file.metadata?.size || 0;
-          total += size;
-          
-          const { data: urlData } = supabase.storage.from('DROP').getPublicUrl(file.name);
-          
-          const row = document.createElement("div");
-          row.className = "file-row";
-          const createdDate = file.created_at ? new Date(file.created_at).toLocaleString('ru-RU') : 'Неизвестно';
-
-          row.innerHTML = `
-            <div class="file-icon" aria-hidden="true">▤</div>
-            <div>
-              <div class="file-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</div>
-              <div class="file-meta">${formatSize(size)} · загружен: ${createdDate}</div>
-            </div>
-            <div style="display: flex; gap: 8px;">
-              <a href="${urlData.publicUrl}" target="_blank" style="color: #fb6872; font-size: 12px; align-self: center; text-decoration: none;">Скачать</a>
-            </div>
-          `;
-          serverFileList.appendChild(row);
-        });
-
-        usedBytes = total;
-        updateStorageDisplay();
-        serverFileCount.textContent = pluralFiles(count);
-
-        if (count === 0) {
-          serverFileList.innerHTML = "<div style='color: var(--muted); font-size: 13px; text-align: center; padding: 20px;'>Файлов пока нет</div>";
-        }
-      } catch (err) {
-        console.error("Ошибка загрузки списка файлов:", err);
-        serverFileList.innerHTML = "<div style='color: var(--error); font-size: 13px; text-align: center; padding: 20px;'>Не удалось загрузить список файлов</div>";
-      }
-    }
-
-    // Отрисовка выбранных файлов
-    function renderFiles() {
-      fileList.innerHTML = "";
-      files.forEach((file, index) => {
-        const row = document.createElement("div");
-        row.className = "file-row";
-        row.innerHTML = `
-          <div class="file-icon" aria-hidden="true">▤</div>
-          <div>
-            <div class="file-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</div>
-            <div class="file-meta">${formatSize(file.size)}</div>
-          </div>
-          <button class="remove-button" type="button" aria-label="Удалить из списка">×</button>
-        `;
-        row.querySelector(".remove-button").addEventListener("click", () => {
-          files.splice(index, 1);
-          renderFiles();
-        });
-        fileList.appendChild(row);
-      });
-
-      fileCount.textContent = pluralFiles(files.length);
-      pendingSize.textContent = formatSize(selectedBytes());
-      uploadButton.disabled = files.length === 0 || isUploading;
-    }
-
-    function setStatus(message, type = "") {
-      statusElement.textContent = message;
-      statusElement.className = `status${type ? ` ${type}` : ""}`;
-    }
-
-    // Добавление файлов в список
-    function addFiles(fileCollection) {
-      const incoming = Array.from(fileCollection);
-      const errors = [];
-      const known = new Set(files.map(file => `${file.name}:${file.size}:${file.lastModified}`));
-
-      for (const file of incoming) {
-        const key = `${file.name}:${file.size}:${file.lastModified}`;
-        if (known.has(key)) continue;
-        if (file.size > FILE_LIMIT) {
-          errors.push(`${file.name}: размер больше 15 ГБ.`);
-          continue;
-        }
-        if (usedBytes + selectedBytes() + file.size > TOTAL_LIMIT) {
-          errors.push(`${file.name}: превышен общий лимит.`);
-          continue;
-        }
-        files.push(file);
-        known.add(key);
-      }
-
-      renderFiles();
-      if (errors.length) {
-        setStatus(errors.join(" "), "error");
-      } else if (incoming.length) {
-        setStatus("Файлы добавлены. Нажмите «Продолжить загрузку».");
-      }
-    }
-
-    function openExpiryDialog() {
-      if (!files.length || isUploading) return;
-      modalBackdrop.classList.add("open");
-      confirmUpload.focus();
-    }
-
-    function closeExpiryDialog() {
-      modalBackdrop.classList.remove("open");
-      uploadButton.focus();
-    }
-
-    function updateExpiryNote() {
-      const optionText = expirySelect.options[expirySelect.selectedIndex].text;
-      expiryNote.textContent = `После загрузки файлы будут доступны ${optionText.toLowerCase()}, затем сервер должен их удалить.`;
-    }
-
-    function showShareModal(uploadedFiles) {
-      shareLinksList.innerHTML = "";
-      uploadedFiles.forEach(item => {
-        const row = document.createElement("div");
-        row.style.display = "flex";
-        row.style.flexDirection = "column";
-        row.style.gap = "6px";
-        
-        row.innerHTML = `
-          <span style="font-size: 12px; font-weight: bold; color: #f5f2f3;">${escapeHtml(item.name)}</span>
-          <div style="display: flex; gap: 6px;">
-            <input type="text" value="${escapeHtml(item.url)}" readonly 
-                   style="flex: 1; padding: 8px; border: 1px solid #363236; border-radius: 8px; background: #111012; color: #aaa1a4; font-size: 11px;">
-            <button class="copy-button" type="button" style="margin-left: 0; padding: 8px 12px;">Копировать</button>
-          </div>
-        `;
-
-        row.querySelector(".copy-button").addEventListener("click", async (e) => {
-          try {
-            await navigator.clipboard.writeText(item.url);
-            e.target.textContent = "Скопировано!";
-            e.target.style.color = "#9fe0b5";
-            e.target.style.borderColor = "#9fe0b5";
-            setTimeout(() => {
-              e.target.textContent = "Копировать";
-              e.target.style.color = "";
-              e.target.style.borderColor = "";
-            }, 2000);
-          } catch {
-            alert("Не удалось скопировать ссылку.");
-          }
-        });
-
-        shareLinksList.appendChild(row);
-      });
-      shareModalBackdrop.classList.add("open");
-    }
-
-    function closeShareDialog() {
-      shareModalBackdrop.classList.remove("open");
-    }
-
-    async function uploadFiles() {
-      if (!files.length || isUploading) return;
-      isUploading = true;
-      uploadButton.disabled = true;
-      confirmUpload.disabled = true;
-      confirmUpload.textContent = "Загрузка…";
-      closeExpiryDialog();
-
-      progressWrap.style.display = "block";
-      progressBar.value = 0;
-      progressPercent.textContent = "0%";
-      progressText.textContent = "Загружаем файлы…";
-      setStatus("Начинаем загрузку...");
-
-      const uploadedResults = [];
-      const expiresInSeconds = parseInt(expirySelect.value);
-      const expiresAt = new Date(Date.now() + expiresInSeconds * 1000).toISOString();
-
-      try {
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          const uniqueName = `${Date.now()}_${file.name}`;
-          
-          const { data, error } = await supabase.storage
-            .from('DROP')
-            .upload(uniqueName, file, { 
-              cacheControl: '3600', 
-              upsert: false,
-              metadata: { expiresAt: expiresAt, originalName: file.name }
-            });
-
-          if (error) throw error;
-
-          const { data: urlData } = supabase.storage.from('DROP').getPublicUrl(uniqueName);
-
-          uploadedResults.push({
-            name: file.name,
-            url: urlData.publicUrl,
-            expiresAt: expiresAt
-          });
-
-          const progress = Math.round(((i + 1) / files.length) * 100);
-          progressBar.value = progress;
-          progressPercent.textContent = progress + "%";
+        if (particle.y < -5) {
+          particle.y = height + 5;
+          particle.x = Math.random() * width;
         }
 
-        showShareModal(uploadedResults);
-        
-        files = [];
-        renderFiles();
-        
-        await loadServerFiles(); // Обновляем список файлов и счетчик
-        
-        setStatus("Файлы успешно загружены!", "success");
-      } catch (error) {
-        console.error("Ошибка Supabase:", error);
-        setStatus("Ошибка загрузки: " + error.message, "error");
-      } finally {
-        isUploading = false;
-        confirmUpload.disabled = false;
-        confirmUpload.textContent = "Загрузить";
-        uploadButton.disabled = files.length === 0;
-        progressText.textContent = "Загрузка завершена";
+        if (particle.x < -5) particle.x = width + 5;
+        if (particle.x > width + 5) particle.x = -5;
+
+        const opacity = particle.sparkle
+          ? .5 + Math.sin(time * 2.2 + particle.phase) * .35
+          : .55;
+
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(183, 235, 255, ${Math.max(.12, opacity)})`;
+        ctx.shadowBlur = particle.sparkle ? 11 : 4;
+        ctx.shadowColor = "#59cfff";
+        ctx.fill();
       }
+
+      ctx.shadowBlur = 0;
+      requestAnimationFrame(draw);
     }
 
-    // === ОБРАБОТЧИКИ СОБЫТИЙ (ВОТ ОНИ, DRAG AND DROP) ===
-    
-    fileInput.addEventListener("change", () => {
-      addFiles(fileInput.files);
-      fileInput.value = "";
-    });
-
-    ["dragenter", "dragover"].forEach(eventName => {
-      dropZone.addEventListener(eventName, event => {
-        event.preventDefault();
-        dropZone.classList.add("dragging");
-      });
-    });
-
-    ["dragleave", "dragend"].forEach(eventName => {
-      dropZone.addEventListener(eventName, event => {
-        event.preventDefault();
-        dropZone.classList.remove("dragging");
-      });
-    });
-
-    dropZone.addEventListener("drop", event => {
-      event.preventDefault();
-      dropZone.classList.remove("dragging");
-      if (event.dataTransfer?.files) {
-        addFiles(event.dataTransfer.files);
-      }
-    });
-
-    // Предотвращаем открытие файлов браузером, если промахнулись мимо зоны
-    document.addEventListener("dragover", event => event.preventDefault());
-    document.addEventListener("drop", event => event.preventDefault());
-
-    // Кнопки и модалки
-    uploadButton.addEventListener("click", openExpiryDialog);
-    confirmUpload.addEventListener("click", uploadFiles);
-    cancelUpload.addEventListener("click", closeExpiryDialog);
-    expirySelect.addEventListener("change", updateExpiryNote);
-
-    modalBackdrop.addEventListener("click", event => {
-      if (event.target === modalBackdrop) closeExpiryDialog();
-    });
-
-    closeShareModal.addEventListener("click", closeShareDialog);
-    shareModalBackdrop.addEventListener("click", event => {
-      if (event.target === shareModalBackdrop) closeShareDialog();
-    });
-
-    document.addEventListener("keydown", event => {
-      if (event.key === "Escape") {
-        if (modalBackdrop.classList.contains("open")) closeExpiryDialog();
-        if (shareModalBackdrop.classList.contains("open")) closeShareDialog();
-      }
-    });
-
-    // Инициализация при загрузке страницы
-    renderFiles();
-    updateExpiryNote();
-    loadServerFiles(); 
+    window.addEventListener("resize", resize);
+    resize();
+    draw();
   </script>
 </body>
 </html>
